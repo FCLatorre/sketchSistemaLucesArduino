@@ -26,42 +26,55 @@ void loop() {
   // put your main code here, to run repeatedly:
   if(Serial.available() > 0){
     String input = Serial.readString();
-    if(input == "OFF" && estado!=input){
-      digitalWrite(posicion, LOW);
-      digitalWrite(cruce, LOW);
-      digitalWrite(carretera, LOW);
+    if(input.startsWith("DATA:")){
+      int aux = input.indexOf('%');
+      int aux2 = input.indexOf('%', aux+1);
+      int aux3 = input.indexOf('%', aux2+1);
+      String nuevoUmbralInferior = input.substring(aux+1,aux2);
+      String nuevoUmbralSuperior = input.substring(aux2+1, aux3);
+      String nuevoTiempoRafagas = input.substring(aux3+1);
+      umbralInferior = nuevoUmbralInferior.toInt();
+      umbralSuperior = nuevoUmbralSuperior.toInt();
+      tiempoRafagas = nuevoTiempoRafagas.toInt()*1000;
     } 
-    else if(input=="AUTO" && estado!=input) {
-    }
-    else if(input=="POSICION" && estado!=input) {
-      digitalWrite(posicion, HIGH);
-      digitalWrite(cruce, LOW);
-      digitalWrite(carretera, LOW);
-    }
-    else if(input=="CRUCE" && estado!=input) {
-      digitalWrite(posicion, HIGH);
-      digitalWrite(cruce, HIGH);
-      digitalWrite(carretera, LOW);
-    }
-    else if(input=="CARRETERA" && estado!=input) {
-      digitalWrite(posicion, LOW);
-      digitalWrite(cruce, LOW);
-      digitalWrite(carretera, HIGH);
-    }
-    else if(input=="RAFAGA" && estado!=input && estado!="CARRETERA") {
-      //Se dejan el resto de luces encendidas como estén porque las largas se sobreponen al resto
-      digitalWrite(carretera, HIGH);
-      delay(tiempoRafagas);
-      digitalWrite(carretera, LOW);
-    }
-
-    if(estado!=input && input!="RAFAGA"){
-      Serial.print("MSG:Cambio de modo.%");
-      Serial.print(estado);
-      Serial.print("%");
-      Serial.println(input);
-      estado = input;
-    }
+    else {
+        if(input == "OFF" && estado!=input){
+          digitalWrite(posicion, LOW);
+          digitalWrite(cruce, LOW);
+          digitalWrite(carretera, LOW);
+        } 
+        else if(input=="AUTO" && estado!=input) {
+        }
+        else if(input=="POSICION" && estado!=input) {
+          digitalWrite(posicion, HIGH);
+          digitalWrite(cruce, LOW);
+          digitalWrite(carretera, LOW);
+        }
+        else if(input=="CRUCE" && estado!=input) {
+          digitalWrite(posicion, HIGH);
+          digitalWrite(cruce, HIGH);
+          digitalWrite(carretera, LOW);
+        }
+        else if(input=="CARRETERA" && estado!=input) {
+          digitalWrite(posicion, LOW);
+          digitalWrite(cruce, LOW);
+          digitalWrite(carretera, HIGH);
+        }
+        else if(input=="RAFAGA" && estado!=input && estado!="CARRETERA") {
+          //Se dejan el resto de luces encendidas como estén porque las largas se sobreponen al resto
+          digitalWrite(carretera, HIGH);
+          delay(tiempoRafagas);
+          digitalWrite(carretera, LOW);
+        }
+    
+        if(estado!=input && input!="RAFAGA"){
+          Serial.print("MSG:Cambio de modo.%");
+          Serial.print(estado);
+          Serial.print("%");
+          Serial.println(input);
+          estado = input;
+        }
+      }
     
    }
 
