@@ -56,9 +56,9 @@ void loop() {
     }
 
     if(estado!=input && input!="RAFAGA"){
-      Serial.print("MSG:Cambio de modo de $");
+      Serial.print("MSG:Cambio de modo.%");
       Serial.print(estado);
-      Serial.print("a $");
+      Serial.print("%");
       Serial.println(input);
       estado = input;
     }
@@ -71,8 +71,12 @@ void loop() {
    
    //Mandar el valor leido a la gráfica
    if(contador==5000){
-     Serial.println("STAT: $");
-     Serial.println(nivelLuzAmbiente);
+     Serial.print("STAT: %");
+     Serial.print(nivelLuzAmbiente);
+     Serial.print("%");
+     Serial.print(umbralSuperior);
+     Serial.print("%");
+     Serial.println(umbralInferior);
      contador=0;
    } else {
     contador++; 
