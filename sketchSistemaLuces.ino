@@ -2,6 +2,8 @@ int posicion = 13;
 int cruce = 12;
 int carretera = 11;
 String estado="OFF";
+boolean encendidasAUTO = false;
+//Configurable quizás
 int contador = 0;
 
 //Configurables
@@ -16,7 +18,7 @@ void setup() {
   pinMode(11, OUTPUT);
   pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
-  //pinMode(A0, INPUT);
+  pinMode(A0, INPUT);
   Serial.begin(9600);
 }
 
@@ -30,7 +32,6 @@ void loop() {
       digitalWrite(carretera, LOW);
     } 
     else if(input=="AUTO" && estado!=input) {
-      Serial.println("Detectado cambio a automático, iniciando modo...");
     }
     else if(input=="POSICION" && estado!=input) {
       digitalWrite(posicion, HIGH);
@@ -47,7 +48,7 @@ void loop() {
       digitalWrite(cruce, LOW);
       digitalWrite(carretera, HIGH);
     }
-    else if(input=="RAFAGA" && estado!=input && input!="CARRETERA") {
+    else if(input=="RAFAGA" && estado!=input && estado!="CARRETERA") {
       //Se dejan el resto de luces encendidas como estén porque las largas se sobreponen al resto
       digitalWrite(carretera, HIGH);
       delay(tiempoRafagas);
@@ -55,9 +56,9 @@ void loop() {
     }
 
     if(estado!=input && input!="RAFAGA"){
-      Serial.print("Cambio de modo de ");
+      Serial.print("MSG:Cambio de modo de $");
       Serial.print(estado);
-      Serial.print("a ");
+      Serial.print("a $");
       Serial.println(input);
       estado = input;
     }
@@ -70,7 +71,7 @@ void loop() {
    
    //Mandar el valor leido a la gráfica
    if(contador==5000){
-     Serial.println("Luz Ambiente:");
+     Serial.println("STAT: $");
      Serial.println(nivelLuzAmbiente);
      contador=0;
    } else {
@@ -79,19 +80,23 @@ void loop() {
 
     //Si el valor es mayor que el umbral>superior yy estamos en automático
     if(nivelLuzAmbiente > umbralSuperior && estado=="AUTO"){
-      // Apagamos cruce y posición
-      Serial.println("Rebasado umbral superior, apagando luces...");
+      // Apagamos cruce y posición y mandamos evento a la plataforma
       digitalWrite(posicion, LOW);
       digitalWrite(cruce, LOW);
-      //Mandamos evento para histórico
+      if(encendidasAUTO==true){
+        Serial.println("MSG:Valor detectado mayor que umbral superior. Apagar Luces");
+        encendidasAUTO=false;
+      }
     }
 
     //Si el valor es menor que el umbral inferior yy estamos en automático
     if(nivelLuzAmbiente < umbralInferior && estado=="AUTO"){
-      //Encendemos posicion y cruce
+      //Encendemos posicion y cruce y mandamos evento a la plataforma
       digitalWrite(posicion, HIGH);
       digitalWrite(cruce, HIGH);
-      Serial.println("Rebasado umbral inferior, encendiendo luces...");
-      //Mandamos evento para histórico
+      if(encendidasAUTO==false){
+        Serial.println("MSG:Valor detectado menor que umbral superior. Encender Luces");
+        encendidasAUTO=true;
+      }  
     }   
 }
