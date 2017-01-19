@@ -24,6 +24,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  Serial.setTimeout(100);
   if(Serial.available() > 0){
     String input = Serial.readString();
     if(input.startsWith("DATA:")){
@@ -44,6 +45,7 @@ void loop() {
           digitalWrite(carretera, LOW);
         } 
         else if(input=="AUTO" && estado!=input) {
+          digitalWrite(posicion, LOW);
         }
         else if(input=="POSICION" && estado!=input) {
           digitalWrite(posicion, HIGH);
@@ -112,7 +114,7 @@ void loop() {
       digitalWrite(posicion, HIGH);
       digitalWrite(cruce, HIGH);
       if(encendidasAUTO==false){
-        Serial.println("MSG:Valor detectado menor que umbral superior. Encender Luces");
+        Serial.println("MSG:Valor detectado menor que umbral inferior. Encender Luces");
         encendidasAUTO=true;
       }  
     }   
